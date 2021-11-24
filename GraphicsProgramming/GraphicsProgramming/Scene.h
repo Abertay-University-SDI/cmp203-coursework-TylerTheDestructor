@@ -7,16 +7,16 @@
 #define _SCENE_H
 
 // Include GLUT, openGL, input.
+#include "glew.h"
 #include "glut.h"
-#include <gl/GL.h>
-#include <gl/GLU.h>
 #include "Input.h"
 #include <stdio.h>
 // Further includes should go here:
 #include "SOIL.h"
 #include <vector>
 #include "Shadow.h"
-
+#include "Camera.h"
+#include "Skybox.h"
 
 class Scene{
 
@@ -41,10 +41,21 @@ protected:
 	void calculateFPS();
 
 	// draw primitive functions
-	
+
+	void drawCube();
+
+	float rotation;
+	float speed = 75;
+	float oldMouseX;
+	float oldMouseY;
+	float mouseX;
+	float mouseY;
+	GLuint myTexture;
 
 	// For access to user input.
 	Input* input;
+	Camera camera;
+	Skybox skyBox;
 		
 	// For Window and frustum calculation.
 	int width, height;

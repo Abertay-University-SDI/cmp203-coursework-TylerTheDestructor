@@ -9,15 +9,95 @@ Scene::Scene(Input *in)
 	initialiseOpenGL();
 
 	// Other OpenGL / render setting should be applied here.
-	
+	myTexture = SOIL_load_OGL_texture(
+		"gfx/transparentChecked.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+	);
 
+	camera.update();
 	// Initialise scene variables
-	
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void Scene::handleInput(float dt)
 {
 	// Handle user input
+	//makes variables for mouse coordinates
+	float mouseX = input->getMouseX(), mouseY = input->getMouseY();
+	int width = glutGet(GLUT_WINDOW_WIDTH), height = glutGet(GLUT_WINDOW_HEIGHT);
+	//adjusts camera according to mouse position (rotates camera left if mouse is left of the center of the window, etc) then resets mouse back to center of window
+	if (mouseX > (width / 2))
+	{
+		camera.rotateX(80.0f, dt);
+		camera.update();
+		glutWarpPointer((width / 2), (height / 2));
+	}
+	if (mouseX < (width / 2))
+	{
+		camera.rotateX(-80.0f, dt);
+		camera.update();
+		glutWarpPointer((width / 2), (height / 2));
+	}
+	if (mouseY > (height / 2))
+	{
+		camera.rotateY(-80.0f, dt);
+		camera.update();
+		glutWarpPointer((width / 2), (height / 2));
+	}
+	if (mouseY < (height / 2))
+	{
+		camera.rotateY(80.0f, dt);
+		camera.update();
+		glutWarpPointer((width / 2), (height / 2));
+	}
+	// Handle user input
+	if (input->isKeyDown('a'))
+	{
+		camera.moveSide(1.0f, dt);
+		camera.update();
+	};
+
+	if (input->isKeyDown('d'))
+	{
+		camera.moveSide(-1.0f, dt);
+		camera.update();
+	};
+
+	if (input->isKeyDown('w'))
+	{
+		camera.moveForward(-1.0f, dt);
+		camera.update();
+	};
+
+	if (input->isKeyDown('s'))
+	{
+		camera.moveForward(1.0f, dt);
+		camera.update();
+	};
+
+	if (input->isKeyDown('q'))
+	{
+		camera.moveUp(1.0f, dt);
+		camera.update();
+	};
+
+	if (input->isKeyDown('e'))
+	{
+		camera.moveUp(-1.0f, dt);
+		camera.update();
+	};
 }
 
 void Scene::update(float dt)
@@ -31,22 +111,40 @@ void Scene::update(float dt)
 void Scene::render() {
 
 	// Clear Color and Depth Buffers
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Reset transformations
 	glLoadIdentity();
 	// Set the camera
-	gluLookAt(0.0f, 0.0f, 6.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	
+	Vector3 camPos = Vector3(camera.getPosition());
+	Vector3 camLook = Vector3(camera.getLook());
+	Vector3 camUp = Vector3(camera.getUp());
+	gluLookAt(camPos.x, camPos.y, camPos.z, camLook.x, camLook.y, camLook.z, camUp.x, camUp.y, camUp.z);
+
+	GLfloat Light_Ambient[] = { 0.1f,0.1f,0.1f,1.0f };
+	GLfloat Light_Diffuse[] = { 1.0f,1.0f,1.0f,1.0f };
+	GLfloat Light_Position[] = { 1.0f,1.0f,1.0f,0.0f };
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, Light_Ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light_Diffuse);
+	glLightfv(GL_LIGHT0, GL_POSITION, Light_Position);
+	glEnable(GL_LIGHT0);
 	// Render geometry/scene here -------------------------------------
+	skyBox.skyboxRender(camPos);
+	glBindTexture(GL_TEXTURE_2D, myTexture);
+	glEnable(GL_DEPTH_TEST);
 	
+	glBegin(GL_QUADS);
+	glEnable(GL_BLEND);
 
-
+	drawCube();
+	glDisable(GL_BLEND);
+	glEnd();
 	// End render geometry --------------------------------------
 
 	// Render text, should be last object rendered.
 	renderTextOutput();
-	
+
 	// Swap buffers, after all objects are rendered.
 	glutSwapBuffers();
 }
@@ -146,4 +244,73 @@ void Scene::displayText(float x, float y, float r, float g, float b, char* strin
 	glLoadIdentity();
 	gluPerspective(fov, ((float)width/(float)height), nearPlane, farPlane);
 	glMatrixMode(GL_MODELVIEW);
+}
+
+void Scene::drawCube()
+{
+	//front face
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(0.5f, -0.5f, 0.5f);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(0.5f, 0.5f, 0.5f);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(-0.5f, 0.5f, 0.5f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+
+	//bottom face
+	glNormal3f(0.0f, -1.0f, 0.0f);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(0.5f, -0.5f, 0.5f);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(0.5f, -0.5f, -0.5f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(-0.5f, -0.5f, -0.5f);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+
+	//left face
+	glNormal3f(-1.0f, 0.0f, 0.0f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(-0.5f, -0.5f, -0.5f);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(-0.5f, 0.5f, -0.5f);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(-0.5f, 0.5f, 0.5f);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+
+	//back face
+	glNormal3f(0.0f, 0.0f, -1.0f);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(0.5f, -0.5f, -0.5f);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(0.5f, 0.5f, -0.5f);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(-0.5f, 0.5f, -0.5f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(-0.5f, -0.5f, -0.5f);
+
+	//top face
+	glNormal3f(0.0f, 1.0f, 0.0f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(0.5f, 0.5f, 0.5f);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(0.5f, 0.5f, -0.5f);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(-0.5f, 0.5f, -0.5f);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(-0.5f, 0.5f, 0.5f);
+
+	//right face
+	glNormal3f(1.0f, 0.0f, 0.0f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(0.5f, -0.5f, -0.5f);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(0.5f, 0.5f, -0.5f);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(0.5f, 0.5f, 0.5f);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(0.5f, -0.5f, 0.5f);
 }
