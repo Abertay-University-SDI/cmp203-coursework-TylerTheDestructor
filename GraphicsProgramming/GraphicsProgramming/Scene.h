@@ -43,6 +43,7 @@ protected:
 	// draw primitive functions
 
 	void drawCube();
+	void drawFloor(float x, float y, float z, float size);
 
 	float rotation;
 	float speed = 75;
@@ -51,6 +52,7 @@ protected:
 	float mouseX;
 	float mouseY;
 	GLuint myTexture;
+	GLuint orbTexture;
 
 	// For access to user input.
 	Input* input;
@@ -66,6 +68,7 @@ protected:
 	char fps[40];
 	char mouseText[40];
 
+	GLUquadric* theOrb = gluNewQuadric();
 };
 
 #endif

@@ -1,7 +1,5 @@
 #include "Camera.h"
 
-#include <iostream>
-using namespace::std;
 Camera::Camera()
 {
 
@@ -34,7 +32,6 @@ void Camera::update()
 	lookAt.x = forward.x + position.x;
 	lookAt.y = forward.y + position.y;
 	lookAt.z = forward.z + position.z;
-	std::cout << lookAt.x << ", " << lookAt.y << ", " << lookAt.z << endl;
 	//Up vector
 	up.x = -cosY * sinR - sinY * sinP * cosR;
 	up.y = cosP * cosR;

@@ -35,7 +35,7 @@ protected:
 	float pitch = 0.0f;
 	float roll = 0.0f;
 
-	Vector3 position = Vector3(0.0f, 0.0f, 6.0f);
+	Vector3 position = Vector3(0.0f, 0.3f, 0.0f);
 	Vector3 lookAt = Vector3(0.0f, 0.0f, 0.0f);
 	Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
 	Vector3 forward = Vector3(0.0f, 0.0f, -1.0f);

@@ -9,24 +9,30 @@ Scene::Scene(Input *in)
 	initialiseOpenGL();
 
 	// Other OpenGL / render setting should be applied here.
-	myTexture = SOIL_load_OGL_texture(
-		"gfx/transparentChecked.png",
+	orbTexture = SOIL_load_OGL_texture(
+		"gfx/damnDaniel.png",
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
-
-	camera.update();
+	myTexture = SOIL_load_OGL_texture(
+		"gfx/grass.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+	);
+	
 	// Initialise scene variables
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+	gluQuadricTexture(theOrb, GL_TRUE);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -103,7 +109,7 @@ void Scene::handleInput(float dt)
 void Scene::update(float dt)
 {
 	// update scene related variables.
-
+	rotation += speed * dt;
 	// Calculate FPS for output
 	calculateFPS();
 }
@@ -111,7 +117,7 @@ void Scene::update(float dt)
 void Scene::render() {
 
 	// Clear Color and Depth Buffers
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	// Reset transformations
 	glLoadIdentity();
@@ -121,9 +127,10 @@ void Scene::render() {
 	Vector3 camUp = Vector3(camera.getUp());
 	gluLookAt(camPos.x, camPos.y, camPos.z, camLook.x, camLook.y, camLook.z, camUp.x, camUp.y, camUp.z);
 
+	//set up light
 	GLfloat Light_Ambient[] = { 0.1f,0.1f,0.1f,1.0f };
 	GLfloat Light_Diffuse[] = { 1.0f,1.0f,1.0f,1.0f };
-	GLfloat Light_Position[] = { 1.0f,1.0f,1.0f,0.0f };
+	GLfloat Light_Position[] = { 0.0f,-1.0f,0.0f,1.0f };
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, Light_Ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light_Diffuse);
@@ -131,15 +138,79 @@ void Scene::render() {
 	glEnable(GL_LIGHT0);
 	// Render geometry/scene here -------------------------------------
 	skyBox.skyboxRender(camPos);
-	glBindTexture(GL_TEXTURE_2D, myTexture);
-	glEnable(GL_DEPTH_TEST);
-	
-	glBegin(GL_QUADS);
-	glEnable(GL_BLEND);
 
-	drawCube();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 1);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glDisable(GL_DEPTH_TEST); 
+	for (int i = -8; i < 8; i++)
+	{
+		for (int j = -8; j < -6; j++)
+		{
+			glBegin(GL_QUADS);
+			drawFloor(i, -0.3f, j, 1);
+			glEnd();
+		}
+	}
+	glEnable(GL_DEPTH_TEST);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glStencilFunc(GL_EQUAL, 1, 1);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+	glBindTexture(GL_TEXTURE_2D, orbTexture);
+	glPushMatrix();
+		glScalef(1.0f, -1.0f, 1.0f);
+		glTranslatef(0.0f, 0.6f, -8.0f);
+		glRotatef(90, -1.0f, 0.0f, 0.0f);
+		glRotatef(180, 0.0f, 2.0f, 0.0f);
+		glRotatef(rotation, 0.0f, 0.0f, 1.0f);
+		gluSphere(theOrb, 0.2, 10, 10);
+	glPopMatrix();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_STENCIL_TEST);
+
+	glColor4f(0.5f, 0.5f, 1.0f, 0.8f);
+	glEnable(GL_BLEND);
+	glDisable(GL_LIGHTING);
+	for (int i = -8; i < 8; i++)
+	{
+		for (int j = -8; j < -6; j++)
+		{
+			glBegin(GL_QUADS);
+			drawFloor(i, -0.3f, j, 1);
+			glEnd();
+		}
+	}
+	
+	glEnable(GL_LIGHTING);
 	glDisable(GL_BLEND);
-	glEnd();
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f); 
+
+	glBindTexture(GL_TEXTURE_2D, orbTexture);
+	glPushMatrix();
+		glTranslatef(0.0f, 0.0f, -8.0f);
+		glRotatef(90, -1.0f, 0.0f, 0.0f);
+		glRotatef(180, 0.0f, 2.0f, 0.0f);
+		glRotatef(rotation, 0.0f, 0.0f, 1.0f);
+		gluSphere(theOrb, 0.2, 10, 10);
+	glPopMatrix();
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glBindTexture(GL_TEXTURE_2D, myTexture);
+
+	for (int i = -8; i < 8; i++)
+	{
+		for (int j = -6; j < 8; j++)
+		{
+			glBegin(GL_QUADS);
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			drawFloor(i, -0.3f, j, 1);
+			glEnd();
+		}
+	}
 	// End render geometry --------------------------------------
 
 	// Render text, should be last object rendered.
@@ -313,4 +384,19 @@ void Scene::drawCube()
 	glVertex3f(0.5f, 0.5f, 0.5f);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(0.5f, -0.5f, 0.5f);
+}
+
+void Scene::drawFloor(float x, float y, float z, float size)
+{
+	glPushMatrix();
+	glNormal3f(0.0f, -1.0f, 0.0f);
+	glTexCoord2f(2.0f, 0.0f);
+	glVertex3f(x, y, z);
+	glTexCoord2f(2.0f, 2.0f);
+	glVertex3f(x, y, (z-size));
+	glTexCoord2f(0.0f, 2.0f);
+	glVertex3f((x - size), y, (z - size));
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f((x - size), y, z);
+	glPopMatrix();
 }

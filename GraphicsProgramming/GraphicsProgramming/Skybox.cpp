@@ -91,6 +91,7 @@ void Skybox::skyboxRender(Vector3 camPos)
 	drawSkybox();
 	glEnd();
 	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
 }
 
