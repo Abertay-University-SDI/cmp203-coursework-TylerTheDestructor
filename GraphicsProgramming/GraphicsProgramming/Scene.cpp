@@ -140,10 +140,12 @@ void Scene::render() {
 	skyBox.skyboxRender(camPos);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
+	//turn off writing to frame buffer and set up stencil
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 1);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	//disable depth test since we dont want depth values when writing to stencil buffer
 	glDisable(GL_DEPTH_TEST); 
 	for (int i = -8; i < 8; i++)
 	{
@@ -154,11 +156,13 @@ void Scene::render() {
 			glEnd();
 		}
 	}
+	//can reenable depth test now
 	glEnable(GL_DEPTH_TEST);
+	//turn writing to frame buffer back on, modify stencil 
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glStencilFunc(GL_EQUAL, 1, 1);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
+	//draw orbs reflection (TODO: replace with a 3D model later?)
 	glBindTexture(GL_TEXTURE_2D, orbTexture);
 	glPushMatrix();
 		glScalef(1.0f, -1.0f, 1.0f);
@@ -170,9 +174,11 @@ void Scene::render() {
 	glPopMatrix();
 
 	glBindTexture(GL_TEXTURE_2D, 0);
+	//stencil test can now be disabled
 	glDisable(GL_STENCIL_TEST);
 
 	glColor4f(0.5f, 0.5f, 1.0f, 0.8f);
+	//enable blending and disable lighting (setting up transparent tiles)
 	glEnable(GL_BLEND);
 	glDisable(GL_LIGHTING);
 	for (int i = -8; i < 8; i++)
@@ -184,11 +190,11 @@ void Scene::render() {
 			glEnd();
 		}
 	}
-	
+	//reenable lighting and disable blend after floor is drawn
 	glEnable(GL_LIGHTING);
 	glDisable(GL_BLEND);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f); 
-
+	//draw orb (same as above orb in that i should use a 3d model)
 	glBindTexture(GL_TEXTURE_2D, orbTexture);
 	glPushMatrix();
 		glTranslatef(0.0f, 0.0f, -8.0f);
@@ -198,7 +204,7 @@ void Scene::render() {
 		gluSphere(theOrb, 0.2, 10, 10);
 	glPopMatrix();
 	glBindTexture(GL_TEXTURE_2D, 0);
-
+	//draw the rest of the floor (non-transparent no reflection crap woohoo normal floor)
 	glBindTexture(GL_TEXTURE_2D, myTexture);
 
 	for (int i = -8; i < 8; i++)
