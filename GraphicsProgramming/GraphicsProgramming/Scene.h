@@ -43,7 +43,7 @@ protected:
 	// draw primitive functions
 
 	void drawCube();
-	void drawFloor(float x, float y, float z, float size);
+	void drawFloor(float x, float y, float z, float size, float texSize);
 
 	float rotation;
 	float speed = 75;
@@ -53,6 +53,7 @@ protected:
 	float mouseY;
 	GLuint myTexture;
 	GLuint orbTexture;
+	GLuint shadowTexture;
 
 	// For access to user input.
 	Input* input;

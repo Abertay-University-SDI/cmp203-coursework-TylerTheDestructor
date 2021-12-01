@@ -9,6 +9,12 @@ Scene::Scene(Input *in)
 	initialiseOpenGL();
 
 	// Other OpenGL / render setting should be applied here.
+	shadowTexture = SOIL_load_OGL_texture(
+		"gfx/imposter.png",
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+	);
 	orbTexture = SOIL_load_OGL_texture(
 		"gfx/damnDaniel.png",
 		SOIL_LOAD_AUTO,
@@ -21,6 +27,7 @@ Scene::Scene(Input *in)
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
+	
 	
 	// Initialise scene variables
 	glEnable(GL_LIGHTING);
@@ -152,7 +159,7 @@ void Scene::render() {
 		for (int j = -8; j < -6; j++)
 		{
 			glBegin(GL_QUADS);
-			drawFloor(i, -0.3f, j, 1);
+			drawFloor(i, -0.3f, j, 1, 2);
 			glEnd();
 		}
 	}
@@ -186,7 +193,7 @@ void Scene::render() {
 		for (int j = -8; j < -6; j++)
 		{
 			glBegin(GL_QUADS);
-			drawFloor(i, -0.3f, j, 1);
+			drawFloor(i, -0.3f, j, 1, 2);
 			glEnd();
 		}
 	}
@@ -203,6 +210,16 @@ void Scene::render() {
 		glRotatef(rotation, 0.0f, 0.0f, 1.0f);
 		gluSphere(theOrb, 0.2, 10, 10);
 	glPopMatrix();
+	glPushMatrix();
+	//FUCK SHADOWS!!!
+	glEnable(GL_BLEND);
+	glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
+	glBindTexture(GL_TEXTURE_2D, shadowTexture);
+	glBegin(GL_QUADS);
+	drawFloor(0.25f, -0.29f, -7.75f, 0.5f, 1);
+	glEnd();
+	glDisable(GL_BLEND);
+	glPopMatrix();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//draw the rest of the floor (non-transparent no reflection crap woohoo normal floor)
 	glBindTexture(GL_TEXTURE_2D, myTexture);
@@ -213,7 +230,7 @@ void Scene::render() {
 		{
 			glBegin(GL_QUADS);
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			drawFloor(i, -0.3f, j, 1);
+			drawFloor(i, -0.3f, j, 1, 2);
 			glEnd();
 		}
 	}
@@ -392,15 +409,15 @@ void Scene::drawCube()
 	glVertex3f(0.5f, -0.5f, 0.5f);
 }
 
-void Scene::drawFloor(float x, float y, float z, float size)
+void Scene::drawFloor(float x, float y, float z, float size, float texSize)
 {
 	glPushMatrix();
 	glNormal3f(0.0f, -1.0f, 0.0f);
-	glTexCoord2f(2.0f, 0.0f);
+	glTexCoord2f(texSize, 0.0f);
 	glVertex3f(x, y, z);
-	glTexCoord2f(2.0f, 2.0f);
+	glTexCoord2f(texSize, texSize);
 	glVertex3f(x, y, (z-size));
-	glTexCoord2f(0.0f, 2.0f);
+	glTexCoord2f(0.0f, texSize);
 	glVertex3f((x - size), y, (z - size));
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f((x - size), y, z);
