@@ -48,7 +48,7 @@ void Scene::handleInput(float dt)
 {
 	// Handle user input
 	//makes variables for mouse coordinates
-	float mouseX = input->getMouseX(), mouseY = input->getMouseY();
+	int mouseX = input->getMouseX(), mouseY = input->getMouseY();
 	int width = glutGet(GLUT_WINDOW_WIDTH), height = glutGet(GLUT_WINDOW_HEIGHT);
 	//adjusts camera according to mouse position (rotates camera left if mouse is left of the center of the window, etc) then resets mouse back to center of window
 	if (mouseX > (width / 2))
@@ -220,20 +220,12 @@ void Scene::render() {
 	glEnd();
 	glDisable(GL_BLEND);
 	glPopMatrix();
-	glBindTexture(GL_TEXTURE_2D, 0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
 	//draw the rest of the floor (non-transparent no reflection crap woohoo normal floor)
-	glBindTexture(GL_TEXTURE_2D, myTexture);
-
-	for (int i = -8; i < 8; i++)
-	{
-		for (int j = -6; j < 8; j++)
-		{
-			glBegin(GL_QUADS);
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			drawFloor(i, -0.3f, j, 1, 2);
-			glEnd();
-		}
-	}
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		floor.calcFloor(16, 14, 2.0f, -8.0f, -0.3f, -6.0f, 1.0f);
+		floor.renderFloor(myTexture);
+	glPopMatrix();
 	// End render geometry --------------------------------------
 
 	// Render text, should be last object rendered.

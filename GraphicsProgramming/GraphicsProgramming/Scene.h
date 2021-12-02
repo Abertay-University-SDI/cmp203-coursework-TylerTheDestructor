@@ -17,6 +17,7 @@
 #include "Shadow.h"
 #include "Camera.h"
 #include "Skybox.h"
+#include "Floor.h"
 
 class Scene{
 
@@ -59,6 +60,7 @@ protected:
 	Input* input;
 	Camera camera;
 	Skybox skyBox;
+	Floor floor;
 		
 	// For Window and frustum calculation.
 	int width, height;
