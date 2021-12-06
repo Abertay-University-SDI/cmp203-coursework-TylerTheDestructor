@@ -21,27 +21,20 @@ Scene::Scene(Input *in)
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
-	myTexture = SOIL_load_OGL_texture(
-		"gfx/grass.png",
-		SOIL_LOAD_AUTO,
-		SOIL_CREATE_NEW_ID,
-		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
-	);
 	
-	
+	shit.initialise();
 	// Initialise scene variables
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	gluQuadricTexture(theOrb, GL_TRUE);
-
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	
 }
 
 void Scene::handleInput(float dt)
@@ -132,17 +125,26 @@ void Scene::render() {
 	Vector3 camPos = Vector3(camera.getPosition());
 	Vector3 camLook = Vector3(camera.getLook());
 	Vector3 camUp = Vector3(camera.getUp());
-	gluLookAt(camPos.x, camPos.y, camPos.z, camLook.x, camLook.y, camLook.z, camUp.x, camUp.y, camUp.z);
+	gluLookAt(camPos.x, camPos.y, camPos.z, camLook.x, camLook.y, camLook.z, camUp.x, 1, camUp.z);
 
 	//set up light
-	GLfloat Light_Ambient[] = { 0.1f,0.1f,0.1f,1.0f };
-	GLfloat Light_Diffuse[] = { 1.0f,1.0f,1.0f,1.0f };
-	GLfloat Light_Position[] = { 0.0f,-1.0f,0.0f,1.0f };
+	//GLfloat Light_Ambient[] = { 0.0f,0.0f,0.0f,1.0f };
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT, Light_Ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light_Diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, Light_Position);
+	GLfloat Light1_Diffuse[] = { 1.0f,1.0f,1.0f,1.0f };
+	GLfloat Light2_Diffuse[] = { 1.0f,0.0f,0.0f,1.0f };
+
+	GLfloat Light1_Position[] = { 0.0f,1.0f,0.0f,1.0f };
+	GLfloat Light2_Position[] = { 7.5f,1.0f,-3.5f,1.0f };
+
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, Light_Ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light1_Diffuse);
+	glLightfv(GL_LIGHT0, GL_POSITION, Light1_Position);
 	glEnable(GL_LIGHT0);
+
+	//glLightfv(GL_LIGHT1, GL_AMBIENT, Light_Ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, Light2_Diffuse);
+	glLightfv(GL_LIGHT1, GL_POSITION, Light2_Position);
+	glEnable(GL_LIGHT1);
 	// Render geometry/scene here -------------------------------------
 	skyBox.skyboxRender(camPos);
 
@@ -154,7 +156,7 @@ void Scene::render() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	//disable depth test since we dont want depth values when writing to stencil buffer
 	glDisable(GL_DEPTH_TEST); 
-	for (int i = -8; i < 8; i++)
+	for (int i = -8; i < 9; i++)
 	{
 		for (int j = -8; j < -6; j++)
 		{
@@ -173,7 +175,7 @@ void Scene::render() {
 	glBindTexture(GL_TEXTURE_2D, orbTexture);
 	glPushMatrix();
 		glScalef(1.0f, -1.0f, 1.0f);
-		glTranslatef(0.0f, 0.6f, -8.0f);
+		glTranslatef(0.0f, 0.5f, -8.0f);
 		glRotatef(90, -1.0f, 0.0f, 0.0f);
 		glRotatef(180, 0.0f, 2.0f, 0.0f);
 		glRotatef(rotation, 0.0f, 0.0f, 1.0f);
@@ -188,7 +190,7 @@ void Scene::render() {
 	//enable blending and disable lighting (setting up transparent tiles)
 	glEnable(GL_BLEND);
 	glDisable(GL_LIGHTING);
-	for (int i = -8; i < 8; i++)
+	for (int i = -8; i < 9; i++)
 	{
 		for (int j = -8; j < -6; j++)
 		{
@@ -204,7 +206,7 @@ void Scene::render() {
 	//draw orb (same as above orb in that i should use a 3d model)
 	glBindTexture(GL_TEXTURE_2D, orbTexture);
 	glPushMatrix();
-		glTranslatef(0.0f, 0.0f, -8.0f);
+		glTranslatef(0.0f, -0.1f, -8.0f);
 		glRotatef(90, -1.0f, 0.0f, 0.0f);
 		glRotatef(180, 0.0f, 2.0f, 0.0f);
 		glRotatef(rotation, 0.0f, 0.0f, 1.0f);
@@ -220,12 +222,13 @@ void Scene::render() {
 	glEnd();
 	glDisable(GL_BLEND);
 	glPopMatrix();
-	//glBindTexture(GL_TEXTURE_2D, 0);
+
 	//draw the rest of the floor (non-transparent no reflection crap woohoo normal floor)
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		floor.calcFloor(16, 14, 2.0f, -8.0f, -0.3f, -6.0f, 1.0f);
-		floor.renderFloor(myTexture);
-	glPopMatrix();
+		shit.calcFloor(17, 14, 2.0f, -8.0f, -0.3f, -6.0f, 1.0f);
+		shit.renderFloor();
+
+	shit.renderPepsi();
 	// End render geometry --------------------------------------
 
 	// Render text, should be last object rendered.
@@ -399,12 +402,12 @@ void Scene::drawCube()
 	glVertex3f(0.5f, 0.5f, 0.5f);
 	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f(0.5f, -0.5f, 0.5f);
-}
+} //this is here exclusively for referencing the code
 
 void Scene::drawFloor(float x, float y, float z, float size, float texSize)
 {
 	glPushMatrix();
-	glNormal3f(0.0f, -1.0f, 0.0f);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glTexCoord2f(texSize, 0.0f);
 	glVertex3f(x, y, z);
 	glTexCoord2f(texSize, texSize);

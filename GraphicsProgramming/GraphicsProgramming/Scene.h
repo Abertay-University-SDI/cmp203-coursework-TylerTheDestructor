@@ -17,7 +17,7 @@
 #include "Shadow.h"
 #include "Camera.h"
 #include "Skybox.h"
-#include "Floor.h"
+#include "shitHandler.h"
 
 class Scene{
 
@@ -52,7 +52,6 @@ protected:
 	float oldMouseY;
 	float mouseX;
 	float mouseY;
-	GLuint myTexture;
 	GLuint orbTexture;
 	GLuint shadowTexture;
 
@@ -60,7 +59,7 @@ protected:
 	Input* input;
 	Camera camera;
 	Skybox skyBox;
-	Floor floor;
+	Shit shit;
 		
 	// For Window and frustum calculation.
 	int width, height;

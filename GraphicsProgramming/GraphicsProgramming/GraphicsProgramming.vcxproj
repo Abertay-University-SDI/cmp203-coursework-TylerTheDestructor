@@ -93,12 +93,12 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shadow.cpp" />
     <ClCompile Include="Skybox.cpp" />
-    <ClCompile Include="Floor.cpp" />
+    <ClCompile Include="shitHandler.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Floor.h" />
+    <ClInclude Include="shitHandler.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Input.h" />

@@ -39,7 +39,7 @@
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Floor.cpp">
+    <ClCompile Include="shitHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,7 +65,7 @@
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Floor.h">
+    <ClInclude Include="shitHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
