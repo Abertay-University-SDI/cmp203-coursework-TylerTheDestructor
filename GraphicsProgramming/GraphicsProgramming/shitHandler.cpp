@@ -12,6 +12,9 @@ void Shit::initialise()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
 	pepsiman.load("models/pepsiman.obj", "models/Pepsiman.png");
+	teapot.load("models/teapot.obj", "gfx/crate.png");
+	
+	glEnable(GL_COLOR_MATERIAL);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
@@ -127,3 +130,39 @@ void Shit::renderPepsi()
 	pepsiman.render();
 	glPopMatrix();
 }
+
+void Shit::renderTeapot()
+{
+	//PUTTING SHADOW STUFF HERE
+	GLfloat shadowLightPos[4] = { -7.5,1,-3.5,1 };
+	GLfloat shadowFloorVerts[12] = { -8.0f,-0.3f,-6.0f, //top left
+									-8.0f,-0.3f,8.0f, //bottom left
+									8.0f,-0.3f,8.0f, // bottom right
+									8.0f,-0.3f,-6.0f }; //top right
+	shadow.generateShadowMatrix(shadowMatrix, shadowLightPos, shadowFloorVerts);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glColor3f(0.1f, 0.1f, 0.1f); // Shadow's colour
+	glPushMatrix();
+	glMultMatrixf((GLfloat*)shadowMatrix);
+	//translate to floor and draw shadow, remember to match any transforms on the object
+	glEnable(GL_BLEND);
+	glTranslatef(-6.8f, 0.1f, -2.8f);
+	glScalef(0.05f, 0.05f, 0.05f);
+	glRotatef(45, 0.0f, 1.0f, 0.0f);
+	teapot.render();
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	glColor3f(1.0f, 1.0f, 1.0f); // S
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+
+	glPushMatrix();
+	glTranslatef(-7.0f, 0.1f, -3.0f);
+	glScalef(0.05f, 0.05f, 0.05f);
+	glRotatef(45, 0.0f, 1.0f, 0.0f);
+	teapot.render();
+	glPopMatrix();
+};

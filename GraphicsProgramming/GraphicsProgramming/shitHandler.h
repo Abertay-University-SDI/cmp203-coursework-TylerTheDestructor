@@ -15,6 +15,7 @@ public:
 	void renderFloor();
 
 	void renderPepsi();
+	void renderTeapot();
 
 	int floorVertCount;
 	float shadowMatrix[16];
@@ -22,5 +23,7 @@ public:
 	std::vector<float> floorVerts, floorNorms, floorTexcoords;
 	Shadow shadow;
 	GLuint grassTex;
+
 	Model pepsiman;
+	Model teapot;
 };

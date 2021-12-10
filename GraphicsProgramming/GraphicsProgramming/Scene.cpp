@@ -22,10 +22,14 @@ Scene::Scene(Input *in)
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
 	);
 	
+	camera1.init(0.0f, 0.3f, 0.0f, 0.0f, 0.0f, -8.0f, 0.0f, 1.0f, 0.0f);
+	camera2.init(-5.0f, 2.0f, 0.0f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
+	camera3.init(0.0f, 0.5f, 0.0f, 0.0f, 0.0f, -8.0f, 0.0f, 1.0f, 0.0f);
+	cameraNumber = 0;
 	shit.initialise();
+
 	// Initialise scene variables
 	glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_TEXTURE_2D);
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -33,78 +37,102 @@ Scene::Scene(Input *in)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	gluQuadricTexture(theOrb, GL_TRUE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	
 }
 
 void Scene::handleInput(float dt)
 {
 	// Handle user input
 	//makes variables for mouse coordinates
-	int mouseX = input->getMouseX(), mouseY = input->getMouseY();
-	int width = glutGet(GLUT_WINDOW_WIDTH), height = glutGet(GLUT_WINDOW_HEIGHT);
 	//adjusts camera according to mouse position (rotates camera left if mouse is left of the center of the window, etc) then resets mouse back to center of window
-	if (mouseX > (width / 2))
+	int mouseX = input->getMouseX(), mouseY = input->getMouseY();
+	if (input->isKeyDown('1'))
 	{
-		camera.rotateX(80.0f, dt);
-		camera.update();
-		glutWarpPointer((width / 2), (height / 2));
+		cameraNumber = 0;
+		input->setKeyUp('1');
 	}
-	if (mouseX < (width / 2))
+	if (input->isKeyDown('2'))
 	{
-		camera.rotateX(-80.0f, dt);
-		camera.update();
-		glutWarpPointer((width / 2), (height / 2));
+		cameraNumber = 1;
+		input->setKeyUp('2');
 	}
-	if (mouseY > (height / 2))
+	if (input->isKeyDown('3'))
 	{
-		camera.rotateY(-80.0f, dt);
-		camera.update();
-		glutWarpPointer((width / 2), (height / 2));
-	}
-	if (mouseY < (height / 2))
-	{
-		camera.rotateY(80.0f, dt);
-		camera.update();
-		glutWarpPointer((width / 2), (height / 2));
+		cameraNumber = 2;
+		input->setKeyUp('3');
 	}
 	// Handle user input
-	if (input->isKeyDown('a'))
-	{
-		camera.moveSide(1.0f, dt);
-		camera.update();
-	};
 
-	if (input->isKeyDown('d'))
-	{
-		camera.moveSide(-1.0f, dt);
-		camera.update();
-	};
 
-	if (input->isKeyDown('w'))
+	switch (cameraNumber)
 	{
-		camera.moveForward(-1.0f, dt);
-		camera.update();
-	};
+	case 0:
+		if (mouseX > (width / 2))
+		{
+			camera1.rotateX(80.0f, dt);
+			camera1.update();
+			glutWarpPointer((width / 2), (height / 2));
+		}
+		if (mouseX < (width / 2))
+		{
+			camera1.rotateX(-80.0f, dt);
+			camera1.update();
+			glutWarpPointer((width / 2), (height / 2));
+		}
+		if (mouseY > (height / 2))
+		{
+			camera1.rotateY(-80.0f, dt);
+			camera1.update();
+			glutWarpPointer((width / 2), (height / 2));
+		}
+		if (mouseY < (height / 2))
+		{
+			camera1.rotateY(80.0f, dt);
+			camera1.update();
+			glutWarpPointer((width / 2), (height / 2));
+		}
+		if (input->isKeyDown('a'))
+		{
+			camera1.moveSide(1.0f, dt);
+			camera1.update();
+		};
+		if (input->isKeyDown('d'))
+		{
+			camera1.moveSide(-1.0f, dt);
+			camera1.update();
+		};
 
-	if (input->isKeyDown('s'))
-	{
-		camera.moveForward(1.0f, dt);
-		camera.update();
-	};
+		if (input->isKeyDown('w'))
+		{
+			camera1.moveForward(-1.0f, dt);
+			camera1.update();
+		};
 
-	if (input->isKeyDown('q'))
-	{
-		camera.moveUp(1.0f, dt);
-		camera.update();
-	};
+		if (input->isKeyDown('s'))
+		{
+			camera1.moveForward(1.0f, dt);
+			camera1.update();
+		};
 
-	if (input->isKeyDown('e'))
-	{
-		camera.moveUp(-1.0f, dt);
-		camera.update();
-	};
-}
+		if (input->isKeyDown('q'))
+		{
+			camera1.moveUp(1.0f, dt);
+			camera1.update();
+		};
+
+		if (input->isKeyDown('e'))
+		{
+			camera1.moveUp(-1.0f, dt);
+			camera1.update();
+		}
+		break;
+	case 1:
+		//stationary camera so doesnt need anything
+		break;
+	case 2:
+		//camera3.update();
+		break;
+	}
+};
 
 void Scene::update(float dt)
 {
@@ -122,31 +150,62 @@ void Scene::render() {
 	// Reset transformations
 	glLoadIdentity();
 	// Set the camera
-	Vector3 camPos = Vector3(camera.getPosition());
-	Vector3 camLook = Vector3(camera.getLook());
-	Vector3 camUp = Vector3(camera.getUp());
-	gluLookAt(camPos.x, camPos.y, camPos.z, camLook.x, camLook.y, camLook.z, camUp.x, 1, camUp.z);
+	switch (cameraNumber) {
+	case 0:
+		gluLookAt(camera1.getPosition().x, camera1.getPosition().y, camera1.getPosition().z, 
+			camera1.getLook().x, camera1.getLook().y, camera1.getLook().z,
+			camera1.getUp().x, camera1.getUp().y, camera1.getUp().z);
+		break;
+	case 1:
+		gluLookAt(camera2.getPosition().x, camera2.getPosition().y, camera2.getPosition().z, 
+			camera2.getLook().x, camera2.getLook().y, camera2.getLook().z,
+			0.0f, 1.0f, 0.0f); //using up vector without mouse controls will make the camera rotate oddly, we don't want this
+		break;
+	case 2:
+		glRotatef(rotation, 0.0f, 1.0f, 0.0f);
+		gluLookAt(camera3.getPosition().x, camera3.getPosition().y, camera3.getPosition().z,
+			camera3.getLook().x, camera3.getLook().y, camera3.getLook().z,
+			0.0f, 1.0f, 0.0f);
+		break;
+	}
+	
 
 	//set up light
-	//GLfloat Light_Ambient[] = { 0.0f,0.0f,0.0f,1.0f };
 
-	GLfloat Light1_Diffuse[] = { 1.0f,1.0f,1.0f,1.0f };
+	GLfloat Light1_Diffuse[] = { 0.0f,1.0f,0.0f,1.0f };
 	GLfloat Light2_Diffuse[] = { 1.0f,0.0f,0.0f,1.0f };
+	GLfloat Light3_Diffuse[] = { 0.0f,0.0f,1.0f,1.0f };
 
-	GLfloat Light1_Position[] = { 0.0f,1.0f,0.0f,1.0f };
+	GLfloat Light1_Position[] = { 0.0f,0.0f,1.0f,1.0f };
 	GLfloat Light2_Position[] = { 7.5f,1.0f,-3.5f,1.0f };
+	GLfloat Light3_Position[] = { -7.5f,1.0f,-3.5f,1.0f };
 
-	//glLightfv(GL_LIGHT0, GL_AMBIENT, Light_Ambient);
+	glPushMatrix();
+	glRotatef(rotation, 0.0f, 1.0f, 0.0f);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light1_Diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, Light1_Position);
+	glLightfv(GL_LIGHT0, GL_POSITION, Light1_Position); 
 	glEnable(GL_LIGHT0);
+	glPopMatrix();
 
-	//glLightfv(GL_LIGHT1, GL_AMBIENT, Light_Ambient);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, Light2_Diffuse);
 	glLightfv(GL_LIGHT1, GL_POSITION, Light2_Position);
 	glEnable(GL_LIGHT1);
+
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, Light3_Diffuse);
+	glLightfv(GL_LIGHT2, GL_POSITION, Light3_Position);
+	glEnable(GL_LIGHT2);
 	// Render geometry/scene here -------------------------------------
-	skyBox.skyboxRender(camPos);
+	switch (cameraNumber) {
+	case 0:
+		skyBox.skyboxRender(camera1.getPosition());
+		break;
+	case 1:
+		skyBox.skyboxRender(camera2.getPosition());
+		break;
+	case 2:
+		skyBox.skyboxRender(camera3.getPosition());
+		break;
+	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//turn off writing to frame buffer and set up stencil
@@ -167,10 +226,12 @@ void Scene::render() {
 	}
 	//can reenable depth test now
 	glEnable(GL_DEPTH_TEST);
+
 	//turn writing to frame buffer back on, modify stencil 
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glStencilFunc(GL_EQUAL, 1, 1);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
 	//draw orbs reflection (TODO: replace with a 3D model later?)
 	glBindTexture(GL_TEXTURE_2D, orbTexture);
 	glPushMatrix();
@@ -203,6 +264,7 @@ void Scene::render() {
 	glEnable(GL_LIGHTING);
 	glDisable(GL_BLEND);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f); 
+
 	//draw orb (same as above orb in that i should use a 3d model)
 	glBindTexture(GL_TEXTURE_2D, orbTexture);
 	glPushMatrix();
@@ -212,6 +274,7 @@ void Scene::render() {
 		glRotatef(rotation, 0.0f, 0.0f, 1.0f);
 		gluSphere(theOrb, 0.2, 10, 10);
 	glPopMatrix();
+
 	glPushMatrix();
 	//FUCK SHADOWS!!!
 	glEnable(GL_BLEND);
@@ -229,6 +292,7 @@ void Scene::render() {
 		shit.renderFloor();
 
 	shit.renderPepsi();
+	shit.renderTeapot();
 	// End render geometry --------------------------------------
 
 	// Render text, should be last object rendered.

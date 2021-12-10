@@ -5,6 +5,19 @@ Camera::Camera()
 
 }
 
+void Camera::init(float posX, float posY, float posZ, float lookX, float lookY, float lookZ, float upX, float upY, float upZ) 
+{
+	position.x = posX;
+	position.y = posY;
+	position.z = posZ;
+	lookAt.x = lookX;
+	lookAt.y = lookY;
+	lookAt.z = lookZ;
+	up.x = lookX;
+	up.y = lookY;
+	up.z = lookZ;
+}
+
 void Camera::update()
 {
 	float cosR, cosP, cosY;

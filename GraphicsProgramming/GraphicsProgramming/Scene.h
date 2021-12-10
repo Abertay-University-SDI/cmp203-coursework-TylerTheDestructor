@@ -57,7 +57,12 @@ protected:
 
 	// For access to user input.
 	Input* input;
-	Camera camera;
+
+	Camera camera1;
+	Camera camera2;
+	Camera camera3;
+	int cameraNumber;
+
 	Skybox skyBox;
 	Shit shit;
 		
