@@ -1,6 +1,6 @@
-#include "shitHandler.h"
+#include "objectHandler.h"
 
-void Shit::initialise()
+void Object::initialise()
 {
 	grassTex = SOIL_load_OGL_texture(
 		"gfx/grass.png",
@@ -18,7 +18,7 @@ void Shit::initialise()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void Shit::calcFloor(float floorCountX, float floorCountZ,float texSize, float quadX, float quadY, float quadZ, float quadSize)
+void Object::calcFloor(float floorCountX, float floorCountZ,float texSize, float quadX, float quadY, float quadZ, float quadSize)
 {
 	floorVertCount = 0;
 	for (int i = quadX; i < (quadX + floorCountX); i += quadSize)
@@ -74,9 +74,9 @@ void Shit::calcFloor(float floorCountX, float floorCountZ,float texSize, float q
 	}
 }
 
-void Shit::renderFloor()
+void Object::renderFloor()
 {
-	//using the second render function from the lab exercise to draw my disc
+	//using the second render function from the lab exercise to draw floor
 	glPushMatrix();
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
@@ -95,7 +95,7 @@ void Shit::renderFloor()
 	glPopMatrix();
 }
 
-void Shit::renderPepsi()
+void Object::renderPepsi()
 {
 	//PUTTING SHADOW STUFF HERE
 	GLfloat shadowLightPos[4] = { 7.5,1,-3.5,1 };
@@ -131,7 +131,7 @@ void Shit::renderPepsi()
 	glPopMatrix();
 }
 
-void Shit::renderTeapot()
+void Object::renderTeapot()
 {
 	//PUTTING SHADOW STUFF HERE
 	GLfloat shadowLightPos[4] = { -7.5,1,-3.5,1 };

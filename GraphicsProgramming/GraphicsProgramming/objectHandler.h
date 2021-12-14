@@ -7,7 +7,7 @@
 #include "Shadow.h"
 #include "Model.h"
 
-class Shit
+class Object
 {
 public:
 	void initialise();

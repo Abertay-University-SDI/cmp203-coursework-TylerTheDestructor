@@ -17,7 +17,7 @@
 #include "Shadow.h"
 #include "Camera.h"
 #include "Skybox.h"
-#include "shitHandler.h"
+#include "objectHandler.h"
 
 class Scene{
 
@@ -62,9 +62,9 @@ protected:
 	Camera camera2;
 	Camera camera3;
 	int cameraNumber;
-
+	Object object;
 	Skybox skyBox;
-	Shit shit;
+	;
 		
 	// For Window and frustum calculation.
 	int width, height;

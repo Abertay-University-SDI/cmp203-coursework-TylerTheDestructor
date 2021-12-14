@@ -26,7 +26,7 @@ Scene::Scene(Input *in)
 	camera2.init(-5.0f, 2.0f, 0.0f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
 	camera3.init(0.0f, 0.5f, 0.0f, 0.0f, 0.0f, -8.0f, 0.0f, 1.0f, 0.0f);
 	cameraNumber = 0;
-	shit.initialise();
+	object.initialise();
 
 	// Initialise scene variables
 	glEnable(GL_LIGHTING);
@@ -176,14 +176,18 @@ void Scene::render() {
 	GLfloat Light2_Diffuse[] = { 1.0f,0.0f,0.0f,1.0f };
 	GLfloat Light3_Diffuse[] = { 0.0f,0.0f,1.0f,1.0f };
 
-	GLfloat Light1_Position[] = { 0.0f,0.0f,1.0f,1.0f };
+	GLfloat Light1_Position[] = { 0.0f,1.0f,1.0f,1.0f };
 	GLfloat Light2_Position[] = { 7.5f,1.0f,-3.5f,1.0f };
 	GLfloat Light3_Position[] = { -7.5f,1.0f,-3.5f,1.0f };
 
+	GLfloat Light1_Direction[] = { 0.0f, -1.0f,0.0f };
+
 	glPushMatrix();
-	glRotatef(rotation, 0.0f, 1.0f, 0.0f);
+	//glRotatef(rotation, 0.0f, 1.0f, 0.0f);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light1_Diffuse);
 	glLightfv(GL_LIGHT0, GL_POSITION, Light1_Position); 
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Light1_Direction); 
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45); 
 	glEnable(GL_LIGHT0);
 	glPopMatrix();
 
@@ -288,11 +292,11 @@ void Scene::render() {
 
 	//draw the rest of the floor (non-transparent no reflection crap woohoo normal floor)
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		shit.calcFloor(17, 14, 2.0f, -8.0f, -0.3f, -6.0f, 1.0f);
-		shit.renderFloor();
+	object.calcFloor(17, 14, 2.0f, -8.0f, -0.3f, -6.0f, 1.0f); //do NOT set quadSize lower than 1
+	object.renderFloor();
 
-	shit.renderPepsi();
-	shit.renderTeapot();
+	object.renderPepsi();
+	object.renderTeapot();
 	// End render geometry --------------------------------------
 
 	// Render text, should be last object rendered.
