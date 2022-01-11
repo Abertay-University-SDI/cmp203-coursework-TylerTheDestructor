@@ -66,6 +66,7 @@ void Scene::handleInput(float dt)
 	switch (cameraNumber)
 	{
 	case 0:
+		//mouse controls for camera 1, wonky but works decently
 		if (mouseX > (width / 2))
 		{
 			camera1.rotateX(80.0f, dt);
@@ -90,6 +91,7 @@ void Scene::handleInput(float dt)
 			camera1.update();
 			glutWarpPointer((width / 2), (height / 2));
 		}
+		//keyboard controls for camera 1
 		if (input->isKeyDown('a'))
 		{
 			camera1.moveSide(1.0f, dt);
@@ -129,7 +131,7 @@ void Scene::handleInput(float dt)
 		//stationary camera so doesnt need anything
 		break;
 	case 2:
-		//camera3.update();
+		//also doesnt need controls
 		break;
 	}
 	//wireframe mode toggle
@@ -201,7 +203,7 @@ void Scene::render() {
 	GLfloat Light1_Direction[] = { 0.0f, -1.0f,0.0f };
 
 	glPushMatrix();
-	//glRotatef(rotation, 0.0f, 1.0f, 0.0f);
+
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light1_Diffuse);
 	glLightfv(GL_LIGHT0, GL_POSITION, Light1_Position); 
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Light1_Direction); 
@@ -255,6 +257,7 @@ void Scene::render() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
 	//draw orbs reflection (TODO: replace with a 3D model later?)
+	// 11/01/22: lmao
 	glBindTexture(GL_TEXTURE_2D, orbTexture);
 	glPushMatrix();
 		glScalef(1.0f, -1.0f, 1.0f);
