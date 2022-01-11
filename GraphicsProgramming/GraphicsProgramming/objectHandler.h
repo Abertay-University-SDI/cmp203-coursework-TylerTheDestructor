@@ -21,6 +21,7 @@ public:
 	float shadowMatrix[16];
 
 	std::vector<float> floorVerts, floorNorms, floorTexcoords;
+
 	Shadow shadow;
 	GLuint grassTex;
 

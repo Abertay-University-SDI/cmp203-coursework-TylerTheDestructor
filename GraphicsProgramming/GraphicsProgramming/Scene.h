@@ -52,6 +52,8 @@ protected:
 	float oldMouseY;
 	float mouseX;
 	float mouseY;
+
+	bool wfMode = false;
 	GLuint orbTexture;
 	GLuint shadowTexture;
 

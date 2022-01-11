@@ -132,6 +132,24 @@ void Scene::handleInput(float dt)
 		//camera3.update();
 		break;
 	}
+	//wireframe mode toggle
+	if (input->isKeyDown('p'))
+	{
+		if (wfMode == false)
+		{
+			glPolygonMode(GL_FRONT, GL_LINE);
+				glPolygonMode(GL_BACK, GL_LINE);
+				input->setKeyUp('p');
+				wfMode = true;
+		}
+		else if (wfMode == true)
+		{
+			glPolygonMode(GL_FRONT, GL_FILL);
+			glPolygonMode(GL_BACK, GL_FILL);
+			input->setKeyUp('p');
+			wfMode = false;
+		}
+	};
 };
 
 void Scene::update(float dt)
@@ -280,7 +298,7 @@ void Scene::render() {
 	glPopMatrix();
 
 	glPushMatrix();
-	//FUCK SHADOWS!!!
+	//draw shadow impostor because im lazy
 	glEnable(GL_BLEND);
 	glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
 	glBindTexture(GL_TEXTURE_2D, shadowTexture);
@@ -294,9 +312,10 @@ void Scene::render() {
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	object.calcFloor(17, 14, 2.0f, -8.0f, -0.3f, -6.0f, 1.0f); //do NOT set quadSize lower than 1
 	object.renderFloor();
-
+	//render objects
 	object.renderPepsi();
 	object.renderTeapot();
+
 	// End render geometry --------------------------------------
 
 	// Render text, should be last object rendered.
